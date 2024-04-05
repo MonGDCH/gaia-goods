@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace plugins\goods\controller;
 
 use mon\http\Request;
-use support\http\Controller;
 use plugins\goods\dao\CateDao;
 use plugins\goods\dao\GoodsDao;
 use plugins\goods\dao\BrandDao;
 use plugins\goods\dao\ModelsDao;
 use plugins\goods\dao\ProductDao;
+use plugins\admin\comm\Controller;
 use plugins\goods\dao\ShippingTmpDao;
 use plugins\goods\contract\GoodsEmun;
 use plugins\goods\contract\GoodsBrandEmun;

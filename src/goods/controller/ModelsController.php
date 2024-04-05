@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace plugins\goods\controller;
 
 use mon\http\Request;
-use support\http\Controller;
 use plugins\goods\dao\SpecDao;
 use plugins\goods\dao\AttrDao;
 use plugins\goods\dao\ModelsDao;
+use plugins\admin\comm\Controller;
 use plugins\goods\contract\GoodsModelsEmun;
 
 /**

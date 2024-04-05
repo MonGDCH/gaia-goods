@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace plugins\goods\controller;
 
 use mon\http\Request;
-use support\http\Controller;
+use plugins\admin\comm\Controller;
 use plugins\goods\dao\ShippingTmpDao;
 use plugins\goods\contract\ShippingTmpEmun;
 

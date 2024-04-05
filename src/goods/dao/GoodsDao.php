@@ -9,7 +9,7 @@ use mon\log\Logger;
 use mon\thinkOrm\Dao;
 use RuntimeException;
 use mon\util\Instance;
-use app\admin\dao\AdminLogDao;
+use plugins\admin\dao\AdminLogDao;
 use plugins\goods\contract\GoodsEmun;
 use plugins\goods\validate\GoodsValidate;
 
