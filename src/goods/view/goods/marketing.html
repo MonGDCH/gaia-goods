@@ -1,0 +1,210 @@
+<?php $this->layout('page'); ?>
+
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" lay-filter="marketing" method="post" action="">
+            <input type="hidden" name="idx" value="<?=$data['id'];?>">
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品分类</label>
+                <div class="layui-input-block">
+                    <input name="cate_cat" id="cate-cat" lay-verify="required" lay-reqText="请选择产品分类"
+                        placeholder="请选择产品分类，必选" class="layui-input"></input>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" id="name" lay-verify="required" lay-reqText="请输入产品名称"
+                        placeholder="请输入产品名称，必填" class="layui-input" value="<?=$data['name']?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品主图</label>
+                <div class="layui-input-block">
+                    <input type="hidden" name="thumb" value="<?=$data['thumb']?>" id="thumb" lay-verify="required"
+                        lay-reqText="请选择产品主图片">
+                    <button type="button" class="layui-btn layui-btn-primary" id="upload-thumb-btn"
+                        style="margin-bottom: 10px;">选择图片</button>
+                    <div class="goods-thumb" id="goods-thumb-box">
+                        <img id="upload-thumb-img" src="<?=$data['thumb']?>" lay-on="img-preview" alt="goods thumb"
+                            width="80" height="80">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">销售时间</label>
+                <div class="layui-inline" id="sale_time">
+                    <div class="layui-input-inline">
+                        <input type="text" name="start_time" id="start_time" class="layui-input"
+                            value="<?=date('Y-m-d H:i:s', $data['sale_start_time'])?>" lay-verify="required"
+                            lay-reqText="请选择销售时间" placeholder="上架日期">
+                    </div>
+                    <div class="layui-form-mid">-</div>
+                    <div class="layui-input-inline">
+                        <input type="text" name="end_time" id="end_time" class="layui-input"
+                            value="<?=date('Y-m-d H:i:s', $data['sale_end_time'])?>" lay-verify="required"
+                            lay-reqText="请选择销售时间" placeholder="下架日期">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">参考价</label>
+                <div class="layui-input-inline">
+                    <input type="number" name="valuation" lay-affix="number" step="0.01" min="0" id="valuation"
+                        lay-precision="2" lay-verify="required" lay-reqText="请输入参考价" placeholder="请输入参考价，必填"
+                        class="layui-input" value="<?=$data['valuation']?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序权重</label>
+                <div class="layui-input-inline">
+                    <input type="number" name="sort" lay-affix="number" step="1" min="0" max="100" lay-precision="0"
+                        lay-verify="required" lay-reqText="请输入排序权重" placeholder="请输入排序权重，必填" class="layui-input"
+                        value="<?=$data['sort']?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品推荐</label>
+                <div class="layui-input-block">
+                    <?= $this->build_checkbox('is_hot', 1, '热门商品', $data['is_hot'] == 1); ?>
+                    <?= $this->build_checkbox('is_new', 1, '首发新品', $data['is_new'] == 1); ?>
+                    <?= $this->build_checkbox('is_recommend', 1, '精品推荐', $data['is_recommend'] == 1); ?>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否配送</label>
+                <div class="layui-input-block">
+                    <?= $this->build_radios('shipping', ['无需配送', '需要配送'], $data['shipping'], ['lay-filter' => 'shipping'], true); ?>
+                </div>
+            </div>
+            <div class="layui-form-item <?=$data['shipping'] == 1 ? '' : 'hidden'?>" id="shipping-tmp">
+                <label class="layui-form-label">配送模板</label>
+                <div class="layui-input-inline">
+                    <select name="shipping_id" lay-search>
+                        <option value="0">默认模板</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item layer-footer hidden">
+                <div class="layui-input-block text-left">
+                    <button class="layui-btn layui-btn-sm layui-btn-success" lay-submit
+                        lay-filter="submit">确认修改</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php $this->block('css'); ?>
+<style>
+    .goods-thumb {
+        border: 1px solid #eee;
+        width: 86px;
+        height: 86px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    #upload-thumb-img {
+        width: 80px;
+        height: 80px;
+    }
+</style>
+<?php $this->blockEnd(); ?>
+
+<?php $this->block('js'); ?>
+<script>
+    layui.use(['laydate', 'mForm', 'cascader', 'imgSelect'], function () {
+        const mForm = layui.mForm
+        const laydate = layui.laydate
+        const cascader = layui.cascader
+        const imgSelect = layui.imgSelect
+
+        // 渲染分类选择
+        cascader({
+            elem: '#cate-cat',
+            value: "<?=$data['cate_cat']?>".split(',').map(v => parseInt(v, 10)),
+            clearable: true,
+            options: JSON.parse('<?=$cateList?>'),
+            placeholder: "请选择产品分类，必选",
+            props: {
+                multiple: true,
+                checkStrictly: true,
+                value: 'id',
+                label: 'name',
+                children: 'children',
+                disabled: 'disabled'
+            }
+        })
+
+        // 图片选择
+        document.querySelector('#upload-thumb-btn').addEventListener('click', () => {
+            imgSelect.show({
+                api: "<?=$this->url('/files')?>",
+                uploadURL: "<?=$this->url('/upload')?>",
+                callback: (data, index) => {
+                    document.querySelector('#thumb').value = data[0].url
+                    document.querySelector('#upload-thumb-img').src = data[0].url
+                }
+            })
+        })
+
+        // 渲染销售时间
+        laydate.render({
+            elem: '#sale_time',
+            type: 'datetime',
+            range: ['#start_time', '#end_time'],
+            rangeLinked: true,
+            format: 'yyyy-MM-dd HH:mm:ss',
+            calendar: true,
+            mark: {
+                '0-12-31': '跨年',
+                '0-11-11': '双十一',
+                '0-12-12': '双十二',
+                '0-06-18': '六一八',
+                '0-08-18': '八一八',
+            }
+        })
+
+        // 是否需要配送
+        mForm.on('radio(shipping)', (data) => {
+            if (data.value == '1') {
+                document.querySelector('#shipping-tmp').classList.remove('hidden')
+            } else {
+                document.querySelector('#shipping-tmp').classList.add('hidden')
+            }
+            mForm.val('marketing', { shipping_id: 0 })
+        })
+
+        mForm.render()
+        // 审核提交
+        mForm.submit('submit', null, null, (form) => {
+            console.log(form)
+            // 是否热门
+            let is_hot = form.field.is_hot || 0
+            // 是否推荐
+            let is_recommend = form.field.is_recommend || 0
+            // 是否新品
+            let is_new = form.field.is_new || 0
+            let cate_cat = JSON.parse(form.field.cate_cat) || []
+            // 上架时间
+            let sale_start_time = Math.ceil((new Date(form.field.start_time)).getTime() / 1000)
+            // 下架时间
+            let sale_end_time = Math.ceil((new Date(form.field.end_time)).getTime() / 1000)
+
+            return {
+                is_hot: is_hot,
+                is_new: is_new,
+                is_recommend: is_recommend,
+                cate_cat: cate_cat.join(','),
+                sale_start_time: sale_start_time,
+                sale_end_time: sale_end_time
+            }
+        })
+    })
+</script>
+<?php $this->blockEnd(); ?>

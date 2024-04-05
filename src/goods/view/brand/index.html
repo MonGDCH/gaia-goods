@@ -1,0 +1,134 @@
+<?php $this->layout('page'); ?>
+
+<!-- 搜索 -->
+<div class="search-panel" id="search-form">
+    <form class="layui-form" lay-filter="search">
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称：</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" placeholder="搜索名称" class="layui-input" autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类：</label>
+            <div class="layui-input-block">
+                <input type="text" name="cate_id" id="cate_id" value="0">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态：</label>
+            <div class="layui-input-block">
+                <?=$this->build_select('status', $status, [], [], true, true)?>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">编辑时间：</label>
+            <div class="layui-input-block">
+                <input type="text" name="update_time" placeholder="搜索编辑时间" class="layui-input date-range"
+                    autocomplete="off">
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div class="layui-card">
+    <div class="layui-card-body m-card-body">
+        <!-- 表格 -->
+        <table id="table" lay-filter="table"></table>
+    </div>
+</div>
+
+<!-- 表格操作栏 -->
+<script type="text/html" id="toolbar">
+    <?= $this->build_toolbar('/goods/brand', $uid, ['add', 'search', 'reset']); ?>
+</script>
+
+<!-- 操作 -->
+<script type="text/html" id="operate">
+    <div class="oper-btns">
+        <?php if($this->checkAuth('/goods/brand/edit', $uid)): ?>
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">修改信息</button>
+        <?php endif; ?>
+    </div>
+</script>
+
+<?php $this->block('js'); ?>
+<script>
+    layui.use(['mTable', 'mForm', 'common', 'cascader'], function () {
+        const mTable = layui.mTable
+        const mForm = layui.mForm
+        const common = layui.common
+        const cascader = layui.cascader
+
+        // 渲染搜索表单
+        const menuList = JSON.parse('<?=$cate?>')
+        const cateCascader = cascader({
+            elem: '#cate_id',
+            clearable: true,
+            value: '',
+            options: menuList,
+            props: {
+                checkStrictly: true,
+                value: 'id',
+                label: 'name',
+                children: 'children',
+                disabled: 'disabled',
+            }
+        });
+        mForm.render()
+        // 渲染表格
+        mTable.render({
+            elem: '#table',
+            url: "<?=$this->url('/goods/brand')?>?isApi=1",
+            cols: [[
+                { field: 'id', title: 'ID', width: 80, align: 'center' },
+                { field: 'name', title: '名称', minWidth: 120 },
+                { field: 'cate_name', title: '所属分类', width: 160 },
+                { field: 'logo', title: 'LOGO', width: 80, align: 'center', templet: (d) => mTable.format.image(d.logo) },
+                { field: 'tel', title: '联系电话', align: 'center', width: 160 },
+                { field: 'web', title: '官网', align: 'center', width: 240, templet: (d) => mTable.format.url(d.web) },
+                { field: 'sort', title: '排序', width: 80, align: 'center', sort: true },
+                { field: 'status', title: '状态', width: 100, align: 'center', templet: function (d) { return mTable.format.status(d.status) } },
+                { field: 'update_time', title: '编辑时间', width: 168, align: 'center', templet: function (d) { return mTable.format.dateTime(d.update_time) }, sort: true },
+                { field: 'operate', title: '操作', templet: '#operate', minWidth: 90, fixed: 'right' }
+            ]]
+        })
+        // 绑定表格事件
+        mTable.bindEvent('table', {
+            // toolbar事件
+            toolbar: {
+                // 新增
+                add: {
+                    url: "<?=$this->url('/goods/brand/add')?>",
+                    title: '新增品牌',
+                },
+                // 搜索
+                search: function (data, reset) {
+                    // 重置
+                    if (reset) {
+                        cateCascader.setValue('')
+                        data.cate_id = ''
+                        return data
+                    }
+                    if (data.update_time) {
+                        let iupdate_time = data.update_time.split(' - ')
+                        data.start_time = common.strtotime(iupdate_time[0] + ' 00:00:00')
+                        data.end_time = common.strtotime(iupdate_time[1] + ' 23:59:59')
+                    }
+
+                    return data
+                },
+            },
+            // tool事件
+            tool: {
+                // 编辑
+                edit: {
+                    url: "<?=$this->url('/goods/brand/edit')?>",
+                    title: '编辑品牌',
+                }
+            },
+        })
+    })
+</script>
+<?php $this->blockEnd(); ?>

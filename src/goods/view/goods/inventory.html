@@ -1,0 +1,97 @@
+<?php $this->layout('page'); ?>
+
+<div class="layui-panel">
+    <div class="panel-container panel-box">
+        <div class="sku-table">
+            <table id="sku-set-table"></table>
+            <table id="sku-table"></table>
+        </div>
+        <div style="margin-bottom: 60px;"></div>
+
+        <form class="layui-form" action="" method="post">
+            <input type="hidden" name="idx" value="<?=$data['id']?>">
+            <div class="layui-form-item layer-footer hidden">
+                <div class="layui-input-block text-left">
+                    <button class="layui-btn layui-btn-sm layui-btn-success" lay-submit
+                        lay-filter="submit">保存全部</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .panel-box {
+        padding: 4px 10px 24px 10px;
+    }
+
+    .sku-img,
+    .sku-set-img {
+        width: 42px;
+        height: 42px;
+        padding: 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .sku-img>.layui-icon,
+    .sku-set-img>.layui-icon {
+        font-size: 28px !important;
+    }
+</style>
+
+<?php $this->block('js'); ?>
+<script>
+    layui.use(['skuTable', 'http', 'mForm'], function () {
+        const skuTable = layui.skuTable
+        const http = layui.http
+        const mForm = layui.mForm
+        const imgSelectOptions = {
+            api: "<?=$this->url('/files')?>",
+            uploadURL: "<?=$this->url('/upload')?>",
+        }
+        const specData = JSON.parse('<?=$data["specs"]?>') || []
+        const skuData = skuTable.formatProductData(JSON.parse('<?=json_encode($data["product"], JSON_UNESCAPED_UNICODE)?>') || [])
+        skuTable.renderSetTable('#sku-set-table', imgSelectOptions)
+        // 渲染sku表格
+        skuTable.renderSkuTable('#sku-table', specData, skuData, imgSelectOptions, (obj) => {
+            const data = obj.data
+            data.idx = data.id
+            data.signLine = 1
+            // 保存单行sku
+            layer.confirm('确认保存该行的信息么？', { icon: 3, title: 'Tips' }, async (index) => {
+                const res = await http.post('', data)
+                if (res.code != '1') {
+                    layer.msg(res.msg, { icon: 2 })
+                    return false;
+                }
+
+                layer.msg(res.msg, { icon: 1 })
+                return true
+            })
+        })
+        // 保存
+        mForm.submit('submit', null, null, (data) => {
+            const tableData = skuTable.getData()
+            const queryData = []
+            tableData.forEach(item => {
+                queryData.push({
+                    idx: item.id,
+                    img: item.img,
+                    price: item.price,
+                    cost_price: item.cost_price,
+                    market_price: item.market_price,
+                    stock: item.stock,
+                    weight: item.weight,
+                    volume: item.volume,
+                    code: item.code,
+                })
+            })
+
+            return { data: JSON.stringify(queryData) }
+        })
+    })
+</script>
+<?php $this->blockEnd(); ?>

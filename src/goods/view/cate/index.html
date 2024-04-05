@@ -1,0 +1,164 @@
+<?php $this->layout('page'); ?>
+<div class="layui-card">
+    <div class="layui-card-body m-card-body">
+        <table id="table" lay-filter="table"></table>
+    </div>
+</div>
+
+<!-- 表格操作栏 -->
+<script type="text/html" id="menu-toolbar">
+    <?php if($this->checkAuth('/goods/cate/add', $uid)): ?>
+    <button class="layui-btn layui-btn-sm layui-btn-success btn-add" lay-event="add">
+        <i class="layui-icon layui-icon-add-1"></i>
+        新增
+    </button> 
+    <?php endif; ?>
+    <button class="layui-btn layui-btn-primary layui-btn-sm" lay-event="expandAll">
+        <i class="layui-icon layui-icon-spread-left"></i>
+        展开
+    </button>
+    <button class="layui-btn layui-btn-primary layui-btn-sm" lay-event="foldAll">
+        <i class="layui-icon layui-icon-shrink-right"></i>
+        折叠
+    </button>
+    <div class="layui-input-inline">
+        <input type="text" id="searchValue" autocomplete="off" placeholder="回车搜索" lay-affix="clear" class="layui-input">
+    </div>
+</script>
+
+<!-- 操作 -->
+<script type="text/html" id="menu-oper">
+    <div class="oper-btns">
+        <?php if($this->checkAuth('/goods/cate/add', $uid)): ?>
+        <!-- {{# if(d.status == 1){ }} -->
+        <button type="button" class="layui-btn layui-btn-success layui-btn-xs" lay-event="add">
+            <i class="layui-icon layui-icon-add-1"> 新增子分类</i>
+        </button>
+        <!-- {{# } }} -->
+        <?php endif; ?>
+        <?php if($this->checkAuth('/goods/cate/edit', $uid)): ?>
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"> 编辑分类</i>
+        </button>
+        <?php endif; ?>
+    </div>
+</script>
+
+<?php $this->block('js'); ?>
+<script>
+    layui.use(['jquery', 'treeTable', 'mTable'], function () {
+        const treeTable = layui.treeTable
+        const mTable = layui.mTable
+        const $ = layui.jquery
+
+        // 渲染分类表格
+        treeTable.render({
+            url: "<?=$this->url('/goods/cate')?>?isApi=1",
+            elem: '#table',
+            toolbar: '#menu-toolbar',
+            defaultToolbar: [{
+                title: '刷新',
+                layEvent: 'refresh',
+                icon: 'layui-icon-refresh'
+            }, 'filter'],
+            skin: 'line',
+            page: false,
+            cols: [[
+                { field: 'id', title: 'ID', width: 80, align: 'center' },
+                { field: 'name', minWidth: 200, title: '名称' },
+                { field: 'img', title: '图标', width: 80, align: 'center', templet: mTable.format.image },
+                { field: 'status', title: '状态', width: 80, align: 'center', templet: mTable.format.status },
+                { field: 'sort', title: '权重', width: 60, align: 'center' },
+                { title: '操作', minWidth: 220, templet: '#menu-oper', fixed: 'right' }
+            ]],
+            response: {
+                statusName: 'code',
+                statusCode: 1,
+                msgName: 'msg',
+                countName: 'count',
+                dataName: 'data'
+            },
+            tree: {
+                view: {
+                    showIcon: false,
+                    dblClickExpand: false,
+                    expandAllDefault: true,
+                },
+                customName: {
+                    id: 'id',
+                    pid: 'pid',
+                    name: 'name'
+                },
+                data: {
+                    isSimpleData: true,
+                    rootPid: 0
+                }
+            },
+        });
+
+        // 搜索表格
+        $('#searchValue').keydown(function (event) {
+            if (event.keyCode == 13) {
+                const keyword = $('#searchValue').val()
+                const id = '#table'
+
+                let $tds = $(id).next('.layui-table-tree').find('.layui-table-body tbody tr td');
+                if (!keyword) {
+                    $tds.css('background-color', 'transparent');
+                    layer.msg("请输入关键字", { icon: 5 });
+                    return;
+                }
+                let searchCount = 0;
+                $tds.each(function () {
+                    $(this).css('background-color', 'transparent');
+                    if ($(this).text().indexOf(keyword) >= 0) {
+                        $(this).css('background-color', 'rgba(250,230,160,0.5)');
+                        if (searchCount == 0) {
+                            $('body,html').stop(true);
+                            $('body,html').animate({ scrollTop: $(this).offset().top - 150 }, 500);
+                        }
+                        searchCount++;
+                    }
+                });
+                if (searchCount == 0) {
+                    layer.msg("没有匹配结果", { icon: 5 });
+                } else {
+                    treeTable.expandAll("table", true);
+                }
+            }
+        })
+
+        // 绑定表格事件
+        mTable.bindEvent('table', {
+            // toolbar事件
+            toolbar: {
+                // 新增
+                add: {
+                    url: "<?=$this->url('/goods/cate/add')?>",
+                    title: '新增分类'
+                },
+                // 展开
+                expandAll: () => {
+                    treeTable.expandAll("table", true);
+                },
+                // 折叠
+                foldAll: () => {
+                    treeTable.expandAll("table", false);
+                }
+            },
+            // 表格tool事件
+            tool: {
+                // 新增
+                add: {
+                    url: "<?=$this->url('/goods/cate/add')?>",
+                    title: '新增子分类'
+                },
+                edit: {
+                    url: "<?=$this->url('/goods/cate/edit')?>",
+                    title: '编辑分类'
+                }
+            }
+        })
+    })
+</script>
+<?php $this->blockEnd(); ?>

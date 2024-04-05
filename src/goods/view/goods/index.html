@@ -1,0 +1,422 @@
+<?php $this->layout('page'); ?>
+
+<!-- 搜索 -->
+<div class="search-panel" id="search-form">
+    <form class="layui-form" lay-filter="search">
+        <div class="layui-form-item">
+            <label class="layui-form-label">ID：</label>
+            <div class="layui-input-block">
+                <input type="number" name="idx" lay-affix="number" min="0" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类：</label>
+            <div class="layui-input-block">
+                <input name="cate" id="cate-search"></input>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">产品名称：</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">营销标签：</label>
+            <div class="layui-input-block">
+                <select name="marketing_tag_search">
+                    <option value=""></option>
+                    <option value="is_hot">热门</option>
+                    <option value="is_new">新品</option>
+                    <option value="is_recommend">推荐</option>
+                    <option value="buy_limit">限购</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="layui-card">
+    <div class="layui-card-body m-card-body">
+        <div class="layui-tab layui-tab-brief" lay-filter="status-tab">
+            <ul class="layui-tab-title">
+                <li lay-id="<?=$secneList['sale']?>" class="layui-this">销售中</li>
+                <li lay-id="<?=$secneList['pre_sale']?>">预售中</li>
+                <li lay-id="<?=$secneList['alert']?>">库存预警</li>
+                <li lay-id="<?=$secneList['not_sale']?>">未上架</li>
+                <li lay-id="<?=$secneList['warehouse']?>">产品仓库</li>
+                <li lay-id="<?=$secneList['all']?>">所有产品</li>
+            </ul>
+        </div>
+        <!-- 表格 -->
+        <table id="table" lay-filter="table"></table>
+    </div>
+</div>
+
+<!-- 表格操作栏 -->
+<script type="text/html" id="toolbar">
+    <?= $this->build_toolbar('/goods/product', $uid, ['add', 'search', 'reset']); ?>
+</script>
+
+<!-- 操作 -->
+<script type="text/html" id="operate">
+    <div class="oper-btns" style="height: 100px; display: flex; align-items: center;">
+        <!-- {{# if(d.status == '1'){ }} -->
+        <?php if($this->checkAuth('/goods/product/inventory', $uid)): ?>
+        <button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="inventory">库存管理</button>
+        <?php endif; ?>
+        <?php if($this->checkAuth('/goods/product/marketing', $uid)): ?>
+        <button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="marketing">运营管理</button>
+        <?php endif; ?>
+        <!-- {{# }else{ }} -->
+        <?php if($this->checkAuth('/goods/product/audit', $uid)): ?>
+        <button type="button" class="layui-btn layui-btn-success layui-btn-xs" lay-event="audit">产品出库</button>
+        <?php endif; ?>
+        <!-- {{# } }} -->
+        <button type="button" class="layui-btn layui-btn-xs" lay-event="more">更多 <i class="layui-icon layui-icon-down"></i></button>
+    </div>
+</script>
+
+<?php $this->block('css'); ?>
+<style>
+    .goods-list-box {
+        all: unset;
+        padding: 2px 0px;
+        line-height: 20px;
+        text-align: left;
+    }
+
+    .goods-list-box .goods-list-box-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+    }
+
+    .goods-list-box .goods-list-box-header>span {
+        font-size: 12px !important;
+    }
+
+    .goods-list-box .goods-list-box-container {
+        display: flex;
+        align-items: start;
+    }
+
+    .goods-list-box .goods-list-box-container .goods-list-thumb {
+        margin-right: 12px;
+    }
+
+    .goods-list-box .goods-list-box-container .goods-list-name-item {
+        display: inline-block;
+        min-width: 54px;
+        margin-bottom: 1px;
+    }
+
+    .sale_time {
+        line-height: 20px;
+    }
+
+    .interaction {
+        line-height: 24px;
+    }
+
+    .goods-badge {
+        height: auto;
+        line-height: 24px;
+        font-size: 12px !important;
+        padding: 2px 8px;
+        margin-right: 8px;
+        cursor: pointer;
+    }
+</style>
+<?php $this->blockEnd(); ?>
+
+<?php $this->block('js'); ?>
+<script>
+    layui.use(['util', 'element', 'mTable', 'mForm', 'common', 'action', 'cascader', 'http'], function () {
+        const util = layui.util
+        const element = layui.element
+        const mTable = layui.mTable
+        const mForm = layui.mForm
+        const common = layui.common
+        const action = layui.action
+        const cascader = layui.cascader
+        const http = layui.http
+
+        const statusList = JSON.parse('<?=$statusList?>')
+        const saleStatusList = JSON.parse('<?=$saleStatusList?>')
+
+        // 标签页 hash 地址定位
+        const hashName = 'tabid';
+        // 获取 lay-id 值
+        let layid = location.hash.replace(new RegExp('^#' + hashName + '='), '');
+        // 初始切换
+        element.tabChange('status-tab', layid);
+        // 切换事件
+        element.on('tab(status-tab)', function (obj) {
+            // location.hash = hashName + '=' + this.getAttribute('lay-id');
+            let index = this.getAttribute('lay-id')
+            mTable.search('table', { scene: index })
+        });
+
+        // 渲染分类搜索
+        const cateSearch = cascader({
+            elem: '#cate-search',
+            clearable: true,
+            value: '',
+            options: JSON.parse('<?=$cateList?>'),
+            props: {
+                checkStrictly: true,
+                value: 'id',
+                label: 'name',
+                children: 'children',
+                disabled: 'disabled'
+            }
+        })
+
+        // 渲染搜索表单
+        mForm.render()
+        // 渲染表格
+        mTable.render({
+            elem: '#table',
+            url: "<?=$this->url('/goods/product')?>?isApi=1",
+            // 定义表格的多行样式
+            lineStyle: 'height: 100px;',
+            where: { scene: document.querySelector('[lay-filter="status-tab"] .layui-this').getAttribute('lay-id') || 1 },
+            cols: [[
+                {
+                    field: 'id', title: '产品', width: 360, align: 'center', sort: true, templet: (d) => {
+                        return `<div class="goods-list-box">
+                                    <div class="goods-list-box-header">
+                                        <span title="ID"># ${d.id}</span>
+                                        <span title="产品类型">${d.virtual_txt}</span>
+                                    </div>
+                                    <div class="goods-list-box-container">
+                                        <div class="goods-list-thumb">
+                                            <img src="${d.thumb}" lay-on="img-preview" alt="thumb" width="64px" height="64px">
+                                        </div>
+                                        <div class="goods-list-name">
+                                            <div><a href="javascript:void(0)" data-id="${d.id}" lay-on="goods-preview">${d.name}</a></div>
+                                        </div>
+                                    </div>
+                                </div>`
+                    }
+                },
+                { field: 'cate_txt', title: '分类', width: 120, align: 'center' },
+                { field: 'valuation', title: '参考价', width: 100, align: 'center', sort: true },
+                { field: 'sales_total', title: '总销量', width: 86, sort: true, align: 'center' },
+                { field: 'stock_total', title: '总库存', width: 86, sort: true, align: 'center' },
+                { field: 'sale_status', title: '销售状态', width: 90, align: 'center', templet: d => getSaleStatus(d) },
+                {
+                    field: 'sale_time', title: '销售时间', width: 160, align: 'center', templet: (d) => {
+                        let start_tiem = util.toDateString(d.sale_start_time * 1000)
+                        let end_time = util.toDateString(d.sale_end_time * 1000)
+                        return `<div class="sale_time"><div>${start_tiem}</div><div>至</div><div>${end_time}</div></div>`
+                    }
+                },
+                {
+                    field: 'marketing', title: '营销标签', width: 126, align: 'center', templet: (d) => {
+                        let tags = []
+                        if (d.is_hot == '1') {
+                            tags.push('<span class="layui-badge goods-badge">热门</span>')
+                        }
+                        if (d.is_new == '1') {
+                            tags.push('<span class="layui-badge goods-badge layui-bg-green">新品</span>')
+                        }
+                        if (d.is_recommend == '1') {
+                            tags.push('<span class="layui-badge goods-badge layui-bg-blue">推荐</span>')
+                        }
+                        if (d.buy_limit == '1') {
+                            tags.push('<span class="layui-badge goods-badge layui-bg-orange">限购</span>')
+
+                        }
+                        return `<div class="text-left">${tags.join('')}</div>`
+                    }
+                },
+                {
+                    field: 'interaction', title: '互动信息', width: 120, align: 'center', templet: (d) => {
+                        return `<div class="interaction text-left">
+                                    <div>点赞数: ${d.star_num}</div>
+                                    <div>收藏数: ${d.collect_num}</div>
+                                    <div>评论数: ${d.comment_num}</div>
+                                </div>`
+                    }
+                },
+                { field: 'sort', title: '排序', width: 72, sort: true, align: 'center' },
+                { field: 'oper', title: '操作', minWidth: 240, templet: '#operate', fixed: 'right' }
+            ]],
+        })
+
+        // 绑定表格事件
+        mTable.bindEvent('table', {
+            // 排序
+            sort: function (data) {
+                let scene = document.querySelector('[lay-filter="status-tab"] .layui-this').getAttribute('lay-id')
+                data.scene = scene || 1
+                return data
+            },
+            // toolbar事件
+            toolbar: {
+                // 新增
+                add: function (obj, table) {
+                    // 跳转新增页面
+                    window.location.href = "<?=$this->url('/goods/product/add')?>"
+                },
+                // 搜索
+                search: function (data, reset) {
+                    let scene = document.querySelector('[lay-filter="status-tab"] .layui-this').getAttribute('lay-id')
+                    data.scene = scene || 1
+                    if (reset) {
+                        data.cate = ''
+                        cateSearch.clearCheckedNodes()
+                        return data;
+                    }
+
+                    if (data.marketing_tag_search) {
+                        data[data.marketing_tag_search] = 1;
+                    }
+
+                    if (data.create_time) {
+                        let iCreate_time = data.create_time.split(' - ')
+                        data.start_time = common.strtotime(iCreate_time[0] + ' 00:00:00')
+                        data.end_time = common.strtotime(iCreate_time[1] + ' 23:59:59')
+                    }
+
+                    return data
+                },
+            },
+            // tool事件
+            tool: {
+                // 审核
+                audit: function (data, table) {
+                    let url = "<?=$this->url('/goods/product/audit')?>" + '?idx=' + data.id
+                    action.drawer(url, `产品审核`)
+                },
+                // 库存调整
+                inventory: function (data, table) {
+                    let url = "<?=$this->url('/goods/product/inventory')?>" + '?idx=' + data.id
+                    action.drawer(url, `库存调整`)
+                },
+                // 运营管理
+                marketing: function (data, table) {
+                    let url = "<?=$this->url('/goods/product/marketing')?>" + '?idx=' + data.id
+                    action.drawer(url, `运营管理`)
+                },
+                // 更多菜单
+                more: function (obj) {
+                    const previewAuth = "<?=$this->checkAuth('/goods/product/preview', $uid) ? 1 : 0?>"
+                    const editAuth = "<?=$this->checkAuth('/goods/product/edit', $uid) ? 1 : 0?>"
+                    const saleAuth = "<?=$this->checkAuth('/goods/product/saleStatus', $uid) ? 1 : 0?>"
+                    const copyAuth = "<?=$this->checkAuth('/goods/product/add', $uid) ? 1 : 0?>"
+                    const moreMenuList = [];
+
+                    if (previewAuth == 1) {
+                        moreMenuList.push({
+                            title: '产品详情',
+                            callback: (data, table) => {
+                                let url = "<?=$this->url('/goods/product/preview')?>" + '?idx=' + data.id
+                                action.drawer(url, `产品详情`)
+                            }
+                        })
+                    }
+                    if (editAuth == 1) {
+                        moreMenuList.push({
+                            title: '编辑产品',
+                            callback: (data, table) => {
+                                window.location.href = "<?=$this->url('/goods/product/edit')?>" + '?idx=' + data.id
+                            }
+                        })
+                    }
+                    if (saleAuth == 1) {
+                        moreMenuList.push({
+                            title: '产品上下架',
+                            callback: (data, table) => {
+                                let sale_status = data.sale_status
+                                let txt = sale_status == 1 ? '下架' : '上架'
+                                layer.confirm(`确定要${txt}该产品吗？`, { icon: 3, title: '注意' }, async (index) => {
+                                    layer.close(index)
+                                    const res = await http.ajax({
+                                        url: "<?=$this->url('/goods/product/saleStatus')?>",
+                                        method: 'POST',
+                                        data: { idx: data.id, sale_status: sale_status == 1 ? 0 : 1 }
+                                    })
+
+                                    if (res.code != '1') {
+                                        layer.msg(res.msg, { icon: 2 })
+                                        return false;
+                                    }
+
+                                    layer.msg(res.msg, { icon: 1 })
+                                    table.reloadData('table')
+                                })
+                            }
+                        })
+                    }
+                    if (copyAuth == 1) {
+                        moreMenuList.push({
+                            title: '复制产品',
+                            callback: (data, table) => {
+                                window.location.href = "<?=$this->url('/goods/product/add')?>" + '?copy=' + data.id
+                            }
+                        })
+                    }
+
+                    return moreMenuList
+                }
+            }
+        })
+
+        // 事件监听
+        util.on('lay-on', {
+            // 预览
+            'goods-preview': function () {
+                console.log(this.dataset.id)
+                layer.alert('暂未开发配置前端产品详情页', { title: 'Tips' })
+                // layer.open({
+                //     type: 2,
+                //     content: ["<?=$this->url('/')?>", ''],
+                //     title: false,
+                //     closeBtn: 0,
+                //     area: ['375px', '640px'],
+                //     shadeClose: true,
+                //     hideOnClose: true,
+                // })
+            }
+        })
+
+        // 获取商品销售状态
+        function getSaleStatus(goods) {
+            let res = (text, color) => {
+                return `<span class="${color}">${text}</span>`
+            }
+
+            // 已出库
+            if (goods.status == statusList['pass']) {
+                if (goods.sale_status == saleStatusList['pre_sale']) {
+                    return res('预售中', 'layui-font-orange')
+                }
+                if (goods.sale_status == saleStatusList['not_sale']) {
+                    return res('未上架', 'layui-font-orange')
+                }
+                if (goods.sale_status == saleStatusList['sale']) {
+                    let now = new Date().getTime()
+                    let start_time = goods.sale_start_time * 1000
+                    let end_time = goods.sale_end_time * 1000
+                    if (start_time <= now && end_time >= now) {
+                        return res('销售中', 'layui-font-red')
+                    }
+                    if (start_time > now) {
+                        return res('预售中', 'layui-font-blue')
+                    }
+                    if (end_time < now) {
+                        return res('已下架', 'layui-font-black')
+                    }
+                }
+            }
+
+            return res('未出库', 'layui-font-gray')
+        }
+    })
+</script>
+
+<?php $this->blockEnd(); ?>

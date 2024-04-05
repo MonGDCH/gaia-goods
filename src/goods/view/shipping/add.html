@@ -1,0 +1,95 @@
+<?php $this->layout('page'); ?>
+
+
+<div class="layui-card" style="margin-bottom: 60px;">
+    <div class="layui-card-body">
+        <form class="layui-form" action="" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" lay-verify="required" lay-verType="tips" lay-reqText="请输入模板名称"
+                        placeholder="请输入模板名称，必填" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">计费方式</label>
+                <div class="layui-input-block">
+                    <?= $this->build_radios('type', $typeList, key($typeList), [], true); ?>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">首件数量</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-affix="number" min="0" name="first" lay-verify="required" lay-reqText="请输入首件数量"
+                        placeholder="请输入首件数量，必填" class="layui-input" value="1">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">首件运费</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-affix="number" min="0" name="first_price" lay-verify="required" lay-reqText="请输入首件运费"
+                        placeholder="请输入首件运费，必填" class="layui-input" value="0">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">续件数量</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-affix="number" min="0" name="continue" lay-verify="required" lay-reqText="请输入续件数量"
+                        placeholder="请输入续件数量，必填" class="layui-input" value="1">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">续件价格</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-affix="number" min="0" name="continue_price" lay-verify="required" lay-reqText="请输入续件价格"
+                        placeholder="请输入续件价格，必填" class="layui-input" value="0">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序权重</label>
+                <div class="layui-input-inline">
+                    <input type="number" name="sort" lay-affix="number" step="1" min="0" max="100" lay-precision="0"
+                        lay-verify="required" lay-reqText="请输入排序权重" placeholder="请输入排序权重，必填" class="layui-input"
+                        value="10">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                    <?= $this->build_radios('status', $status, key($status), [], true); ?>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <textarea class="layui-textarea" name="remark" placeholder="请输入备注，选填"></textarea>
+                </div>
+            </div>
+
+            <div class="layui-form-item layer-footer hidden">
+                <div class="layui-input-block text-left">
+                    <button class="layui-btn layui-btn-sm layui-btn-success" lay-submit
+                        lay-filter="submit">确认提交</button>
+                    <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php $this->block('js'); ?>
+<script>
+    layui.use(['mForm'], function (mForm) {
+        // 渲染表单
+        mForm.render()
+        mForm.submit('submit')
+    })
+</script>
+<?php $this->blockEnd(); ?>

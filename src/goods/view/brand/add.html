@@ -1,0 +1,128 @@
+<?php $this->layout('page'); ?>
+
+<div class="layui-card page-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" lay-verify="required" lay-verType="tips" lay-reqText="请输入名称"
+                        placeholder="请输入名称，必填" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类</label>
+                <div class="layui-input-block">
+                    <input type="text" name="cate_id" id="cate_id" value="0">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">LOGO</label>
+                <div class="layui-input-group">
+                    <input type="text" name="logo" placeholder="LOGO，选填" id="img" class="layui-input">
+                    <div class="layui-input-suffix">
+                        <button type="button" class="layui-btn layui-btn-primary" id="upload">选择图片</button>
+                        <button type="button" class="layui-btn layui-btn-primary" id="preview">预览</button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">联系电话</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="tel" placeholder="请输入联系电话，选填" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">品牌官网</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="web" placeholder="请输入品牌官网，选填" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">品牌描述</label>
+                <div class="layui-input-block">
+                    <textarea class="layui-textarea" name="remark" maxlength="250" placeholder="备注信息，选填"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">权重</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-affix="number" name="sort" value="50" step="1" min="0" max="100"
+                        lay-verify="required|number" lay-verType="tips" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <?= $this->build_radios('status', $status, key($status), [], true); ?>
+                </div>
+            </div>
+            <div class="layui-form-item layer-footer hidden">
+                <div class="layui-input-block text-left">
+                    <button class="layui-btn layui-btn-sm layui-btn-success" lay-submit
+                        lay-filter="submit">确认提交</button>
+                    <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php $this->block('js'); ?>
+<script>
+    layui.use(['mForm', 'imgSelect', 'cascader'], function () {
+        const mForm = layui.mForm
+        const imgSelect = layui.imgSelect
+        const cascader = layui.cascader
+
+        const menuList = JSON.parse('<?=$cate?>')
+        const cateList = cascader({
+            elem: '#cate_id',
+            clearable: true,
+            value: 0,
+            options: menuList,
+            props: {
+                checkStrictly: true,
+                value: 'id',	        //指定选项的值为选项对象的某个属性值	string	—	'value'
+                label: 'name',	        //指定选项标签为选项对象的某个属性值	string	—	'label'
+                children: 'children',	  //指定选项的子选项为选项对象的某个属性值	string	—	'children'
+                disabled: 'disabled',   //指定选项的禁用为选项对象的某个属性值	string	—	'disabled'
+            }
+        });
+
+        // 渲染表单
+        mForm.render()
+
+        mForm.submit('submit', null, null, (form) => {
+            const cate_id = cateList.getCheckedValues()
+            return { cate_id: cate_id }
+        })
+
+        // 图片选择
+        document.querySelector('#upload').addEventListener('click', () => {
+            imgSelect.show({
+                api: "<?=$this->url('/files')?>",
+                uploadURL: "<?=$this->url('/upload')?>",
+                callback: (data, index) => {
+                    document.querySelector('#img').value = data[0].url
+                }
+            })
+        })
+        // 图片预览
+        document.querySelector('#preview').addEventListener('click', () => {
+            let url = document.querySelector('#img').value
+            if (url) {
+                top.layer.photos({
+                    photos: {
+                        title: "图片预览",
+                        data: [{ alt: '', src: url }]
+                    },
+                    // 是否显示底部栏
+                    footer: true,
+                    shade: 0.75
+                });
+            }
+        })
+    })
+</script>
+<?php $this->blockEnd(); ?>

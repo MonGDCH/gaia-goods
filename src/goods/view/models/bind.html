@@ -1,0 +1,71 @@
+<?php $this->layout('page'); ?>
+
+
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="" method="post">
+            <input type="hidden" name="idx" value="<?=$idx?>">
+            <input type="hidden" name="bind" value="<?=$bind?>">
+
+            <!-- 穿梭框 -->
+            <div class="center-block text-center">
+                <div id="transfer" class="text-left"></div>
+            </div>
+
+            <div class="layui-form-item layer-footer hidden">
+                <div class="layui-input-block text-left">
+                    <button class="layui-btn layui-btn-sm layui-btn-success" lay-submit
+                        lay-filter="submit">确认提交</button>
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" lay-on="reset">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php $this->block('js'); ?>
+<script>
+    layui.use(['mForm', 'transfer', 'util'], function (mForm, transfer, util) {
+        const listData = JSON.parse('<?=$list?>')
+        const valueData = JSON.parse('<?=$select?>')
+        transfer.render({
+            elem: '#transfer',
+            id: 'transfer',
+            title: ['全部', '已绑定'],
+            showSearch: true,
+            searchPlaceholder: '搜索',
+            data: listData,
+            value: valueData,
+            text: {
+                none: '无数据',
+                searchNone: '无匹配数据'
+            },
+            parseData: function (res) {
+                return {
+                    "value": res.id,
+                    "title": res.name,
+                };
+            }
+        })
+
+        // 渲染表单
+        mForm.render()
+        mForm.submit('submit', null, null, (form) => {
+            const transferData = transfer.getData('transfer');
+            console.log(transferData)
+            const values = transferData.map(item => item.value).join(',')
+            return { values: values };
+        })
+
+        // 事件监听
+        util.on('lay-on', {
+            reset: function () {
+                transfer.reload('transfer', {
+                    data: listData,
+                    value: valueData
+                });
+            },
+        })
+    })
+</script>
+<?php $this->blockEnd(); ?>
