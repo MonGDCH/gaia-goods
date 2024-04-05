@@ -51,12 +51,16 @@ class InitCommand extends Command
      * @var array
      */
     protected $menu = [
-        ['name' => 'cms', 'title' => '内容管理', 'icon' => 'layui-icon layui-icon-template-1', 'chilid' => [
-            ['name' => '/cms/ad', 'title' => '区块广告', 'icon' => 'layui-icon layui-icon-template-1'],
-            ['name' => '/cms/cate', 'title' => '栏目分类', 'icon' => 'layui-icon layui-icon-template-1'],
-            ['name' => '/cms/page', 'title' => '独立页面', 'icon' => 'layui-icon layui-icon-template-1'],
-            ['name' => '/cms/article', 'title' => '文章管理', 'icon' => 'layui-icon layui-icon-template-1'],
-            ['name' => '/cms/comment', 'title' => '用户评论', 'icon' => 'layui-icon layui-icon-template-1'],
+        ['name' => 'goods', 'title' => '商品管理', 'icon' => 'layui-icon layui-icon-app', 'chilid' => [
+            ['name' => 'model', 'title' => '产品模型', 'icon' => 'layui-icon layui-icon-template-1', 'chilid' => [
+                ['name' => '/goods/models', 'title' => '模型管理', 'icon' => 'layui-icon layui-icon-template-1'],
+                ['name' => '/goods/attr', 'title' => '属性管理', 'icon' => 'layui-icon layui-icon-template-1'],
+                ['name' => '/goods/spec', 'title' => '规格管理', 'icon' => 'layui-icon layui-icon-template-1'],
+            ]],
+            ['name' => '/goods/cate', 'title' => '产品分类', 'icon' => 'layui-icon layui-icon-cols'],
+            ['name' => '/goods/brand', 'title' => '产品品牌', 'icon' => 'layui-icon layui-icon-note'],
+            ['name' => '/goods/product', 'title' => '产品管理', 'icon' => 'layui-icon layui-icon-gift'],
+            ['name' => '/goods/shipping', 'title' => '配送模板', 'icon' => 'layui-icon layui-icon-template'],
         ]],
     ];
 
@@ -66,54 +70,54 @@ class InitCommand extends Command
      * @var array
      */
     protected $rule = [
-        ['name' => 'cms', 'title' => '内容管理', 'chilid' => [
+        ['name' => 'goods', 'title' => '内容管理', 'chilid' => [
             ['name' => 'ad', 'title' => '区块广告', 'chilid' => [
-                ['name' => '/cms/ad', 'title' => '查看'],
-                ['name' => '/cms/ad/add', 'title' => '新增'],
-                ['name' => '/cms/ad/edit', 'title' => '编辑'],
+                ['name' => '/goods/ad', 'title' => '查看'],
+                ['name' => '/goods/ad/add', 'title' => '新增'],
+                ['name' => '/goods/ad/edit', 'title' => '编辑'],
                 ['name' => 'adAssets', 'title' => '区块资源', 'chilid' => [
-                    ['name' => '/cms/ad/assets', 'title' => '查看'],
-                    ['name' => '/cms/ad/assets/add', 'title' => '新增'],
-                    ['name' => '/cms/ad/assets/edit', 'title' => '编辑'],
+                    ['name' => '/goods/ad/assets', 'title' => '查看'],
+                    ['name' => '/goods/ad/assets/add', 'title' => '新增'],
+                    ['name' => '/goods/ad/assets/edit', 'title' => '编辑'],
                 ]],
             ]],
             ['name' => 'cate', 'title' => '栏目分类', 'chilid' => [
-                ['name' => '/cms/cate', 'title' => '查看'],
-                ['name' => '/cms/cate/add', 'title' => '新增'],
-                ['name' => '/cms/cate/edit', 'title' => '编辑'],
+                ['name' => '/goods/cate', 'title' => '查看'],
+                ['name' => '/goods/cate/add', 'title' => '新增'],
+                ['name' => '/goods/cate/edit', 'title' => '编辑'],
             ]],
             ['name' => 'article', 'title' => '内容管理', 'chilid' => [
-                ['name' => '/cms/article', 'title' => '查看'],
-                ['name' => '/cms/article/add', 'title' => '新增'],
-                ['name' => '/cms/article/edit', 'title' => '编辑'],
-                ['name' => '/cms/article/detail', 'title' => '查看详情'],
-                ['name' => '/cms/article/preview', 'title' => '预览'],
-                ['name' => '/cms/article/interact', 'title' => '修改互动信息'],
-                ['name' => '/cms/article/displays', 'title' => '修改展示信息'],
-                ['name' => '/cms/article/toggle', 'title' => '修改状态'],
+                ['name' => '/goods/article', 'title' => '查看'],
+                ['name' => '/goods/article/add', 'title' => '新增'],
+                ['name' => '/goods/article/edit', 'title' => '编辑'],
+                ['name' => '/goods/article/detail', 'title' => '查看详情'],
+                ['name' => '/goods/article/preview', 'title' => '预览'],
+                ['name' => '/goods/article/interact', 'title' => '修改互动信息'],
+                ['name' => '/goods/article/displays', 'title' => '修改展示信息'],
+                ['name' => '/goods/article/toggle', 'title' => '修改状态'],
                 ['name' => 'articleTag', 'title' => '内容标签', 'chilid' => [
-                    ['name' => '/cms/article/tag', 'title' => '查看'],
-                    ['name' => '/cms/article/tag/add', 'title' => '新增'],
-                    ['name' => '/cms/article/tag/edit', 'title' => '编辑'],
+                    ['name' => '/goods/article/tag', 'title' => '查看'],
+                    ['name' => '/goods/article/tag/add', 'title' => '新增'],
+                    ['name' => '/goods/article/tag/edit', 'title' => '编辑'],
                 ]],
             ]],
             ['name' => 'page', 'title' => '独立页面', 'chilid' => [
-                ['name' => '/cms/page', 'title' => '查看'],
-                ['name' => '/cms/page/add', 'title' => '新增'],
-                ['name' => '/cms/page/edit', 'title' => '编辑'],
-                ['name' => '/cms/page/preview', 'title' => '预览'],
-                ['name' => '/cms/page/interact', 'title' => '修改互动信息'],
-                ['name' => '/cms/page/displays', 'title' => '修改展示信息'],
-                ['name' => '/cms/page/toggle', 'title' => '修改状态'],
+                ['name' => '/goods/page', 'title' => '查看'],
+                ['name' => '/goods/page/add', 'title' => '新增'],
+                ['name' => '/goods/page/edit', 'title' => '编辑'],
+                ['name' => '/goods/page/preview', 'title' => '预览'],
+                ['name' => '/goods/page/interact', 'title' => '修改互动信息'],
+                ['name' => '/goods/page/displays', 'title' => '修改展示信息'],
+                ['name' => '/goods/page/toggle', 'title' => '修改状态'],
             ]],
             ['name' => 'comment', 'title' => '用户评论', 'chilid' => [
-                ['name' => '/cms/comment', 'title' => '查看'],
-                ['name' => '/cms/comment/add', 'title' => '新增'],
-                ['name' => '/cms/comment/edit', 'title' => '编辑'],
-                ['name' => '/cms/comment/preview', 'title' => '预览'],
-                ['name' => '/cms/comment/interact', 'title' => '修改互动信息'],
-                ['name' => '/cms/comment/displays', 'title' => '修改展示信息'],
-                ['name' => '/cms/comment/toggle', 'title' => '修改状态'],
+                ['name' => '/goods/comment', 'title' => '查看'],
+                ['name' => '/goods/comment/add', 'title' => '新增'],
+                ['name' => '/goods/comment/edit', 'title' => '编辑'],
+                ['name' => '/goods/comment/preview', 'title' => '预览'],
+                ['name' => '/goods/comment/interact', 'title' => '修改互动信息'],
+                ['name' => '/goods/comment/displays', 'title' => '修改展示信息'],
+                ['name' => '/goods/comment/toggle', 'title' => '修改状态'],
             ]]
         ]]
     ];
