@@ -51,7 +51,7 @@ class InitCommand extends Command
      * @var array
      */
     protected $menu = [
-        ['name' => 'goods', 'title' => '商品管理', 'icon' => 'layui-icon layui-icon-app', 'chilid' => [
+        ['name' => 'goods', 'title' => '产品管理', 'icon' => 'layui-icon layui-icon-app', 'chilid' => [
             ['name' => 'model', 'title' => '产品模型', 'icon' => 'layui-icon layui-icon-template-1', 'chilid' => [
                 ['name' => '/goods/models', 'title' => '模型管理', 'icon' => 'layui-icon layui-icon-template-1'],
                 ['name' => '/goods/attr', 'title' => '属性管理', 'icon' => 'layui-icon layui-icon-template-1'],
@@ -59,7 +59,7 @@ class InitCommand extends Command
             ]],
             ['name' => '/goods/cate', 'title' => '产品分类', 'icon' => 'layui-icon layui-icon-cols'],
             ['name' => '/goods/brand', 'title' => '产品品牌', 'icon' => 'layui-icon layui-icon-note'],
-            ['name' => '/goods/product', 'title' => '产品管理', 'icon' => 'layui-icon layui-icon-gift'],
+            ['name' => '/goods/product', 'title' => '产品列表', 'icon' => 'layui-icon layui-icon-gift'],
             ['name' => '/goods/shipping', 'title' => '配送模板', 'icon' => 'layui-icon layui-icon-template'],
         ]],
     ];
@@ -70,55 +70,48 @@ class InitCommand extends Command
      * @var array
      */
     protected $rule = [
-        ['name' => 'goods', 'title' => '内容管理', 'chilid' => [
-            ['name' => 'ad', 'title' => '区块广告', 'chilid' => [
-                ['name' => '/goods/ad', 'title' => '查看'],
-                ['name' => '/goods/ad/add', 'title' => '新增'],
-                ['name' => '/goods/ad/edit', 'title' => '编辑'],
-                ['name' => 'adAssets', 'title' => '区块资源', 'chilid' => [
-                    ['name' => '/goods/ad/assets', 'title' => '查看'],
-                    ['name' => '/goods/ad/assets/add', 'title' => '新增'],
-                    ['name' => '/goods/ad/assets/edit', 'title' => '编辑'],
-                ]],
-            ]],
-            ['name' => 'cate', 'title' => '栏目分类', 'chilid' => [
+        ['name' => 'goods', 'title' => '产品管理', 'chilid' => [
+            ['name' => 'goods_cate', 'title' => '产品分类', 'chilid' => [
                 ['name' => '/goods/cate', 'title' => '查看'],
                 ['name' => '/goods/cate/add', 'title' => '新增'],
-                ['name' => '/goods/cate/edit', 'title' => '编辑'],
+                ['name' => '/goods/cate/edit', 'title' => '编辑']
             ]],
-            ['name' => 'article', 'title' => '内容管理', 'chilid' => [
-                ['name' => '/goods/article', 'title' => '查看'],
-                ['name' => '/goods/article/add', 'title' => '新增'],
-                ['name' => '/goods/article/edit', 'title' => '编辑'],
-                ['name' => '/goods/article/detail', 'title' => '查看详情'],
-                ['name' => '/goods/article/preview', 'title' => '预览'],
-                ['name' => '/goods/article/interact', 'title' => '修改互动信息'],
-                ['name' => '/goods/article/displays', 'title' => '修改展示信息'],
-                ['name' => '/goods/article/toggle', 'title' => '修改状态'],
-                ['name' => 'articleTag', 'title' => '内容标签', 'chilid' => [
-                    ['name' => '/goods/article/tag', 'title' => '查看'],
-                    ['name' => '/goods/article/tag/add', 'title' => '新增'],
-                    ['name' => '/goods/article/tag/edit', 'title' => '编辑'],
-                ]],
+            ['name' => 'goods_brand', 'title' => '产品品牌', 'chilid' => [
+                ['name' => '/goods/brand', 'title' => '查看'],
+                ['name' => '/goods/brand/add', 'title' => '新增'],
+                ['name' => '/goods/brand/edit', 'title' => '编辑']
             ]],
-            ['name' => 'page', 'title' => '独立页面', 'chilid' => [
-                ['name' => '/goods/page', 'title' => '查看'],
-                ['name' => '/goods/page/add', 'title' => '新增'],
-                ['name' => '/goods/page/edit', 'title' => '编辑'],
-                ['name' => '/goods/page/preview', 'title' => '预览'],
-                ['name' => '/goods/page/interact', 'title' => '修改互动信息'],
-                ['name' => '/goods/page/displays', 'title' => '修改展示信息'],
-                ['name' => '/goods/page/toggle', 'title' => '修改状态'],
+            ['name' => 'goods_shipping', 'title' => '发货模板', 'chilid' => [
+                ['name' => '/goods/shipping', 'title' => '查看'],
+                ['name' => '/goods/shipping/add', 'title' => '新增'],
+                ['name' => '/goods/shipping/edit', 'title' => '编辑']
             ]],
-            ['name' => 'comment', 'title' => '用户评论', 'chilid' => [
-                ['name' => '/goods/comment', 'title' => '查看'],
-                ['name' => '/goods/comment/add', 'title' => '新增'],
-                ['name' => '/goods/comment/edit', 'title' => '编辑'],
-                ['name' => '/goods/comment/preview', 'title' => '预览'],
-                ['name' => '/goods/comment/interact', 'title' => '修改互动信息'],
-                ['name' => '/goods/comment/displays', 'title' => '修改展示信息'],
-                ['name' => '/goods/comment/toggle', 'title' => '修改状态'],
-            ]]
+            ['name' => 'goods_attr', 'title' => '产品属性', 'chilid' => [
+                ['name' => '/goods/attr', 'title' => '查看'],
+                ['name' => '/goods/attr/add', 'title' => '新增'],
+                ['name' => '/goods/attr/edit', 'title' => '编辑']
+            ]],
+            ['name' => 'goods_spec', 'title' => '产品规格', 'chilid' => [
+                ['name' => '/goods/spec', 'title' => '查看'],
+                ['name' => '/goods/spec/add', 'title' => '新增'],
+                ['name' => '/goods/spec/edit', 'title' => '编辑']
+            ]],
+            ['name' => 'goods_models', 'title' => '产品模型', 'chilid' => [
+                ['name' => '/goods/models', 'title' => '查看'],
+                ['name' => '/goods/models/add', 'title' => '新增'],
+                ['name' => '/goods/models/edit', 'title' => '编辑'],
+                ['name' => '/goods/models/detail', 'title' => '详情']
+            ]],
+            ['name' => 'goods_product', 'title' => '产品列表', 'chilid' => [
+                ['name' => '/goods/product', 'title' => '查看'],
+                ['name' => '/goods/product/add', 'title' => '新增'],
+                ['name' => '/goods/product/edit', 'title' => '编辑'],
+                ['name' => '/goods/product/preview', 'title' => '预览'],
+                ['name' => '/goods/product/audit', 'title' => '出库'],
+                ['name' => '/goods/product/inventory', 'title' => '库存管理'],
+                ['name' => '/goods/product/marketing', 'title' => '运营管理'],
+                ['name' => '/goods/product/saleStatus', 'title' => '上下架'],
+            ]],
         ]]
     ];
 
@@ -140,7 +133,7 @@ class InitCommand extends Command
         $out->spinBegiin();
         foreach ($sqls as $i => $sql) {
             Db::execute($sql);
-            if ($i % 5 == 0) {
+            if ($i % 3 == 0) {
                 $out->spin();
             }
         }

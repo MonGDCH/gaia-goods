@@ -432,7 +432,7 @@
         const goods = layui.goods;
         const sdk = goods.render({
             homeURL: "<?=$this->url('/goods/product')?>" + '#tabid=0',
-            getModelsURL: "<?=$this->url('/goods/models/getInfo')?>",
+            getModelsURL: "<?=$this->url('/goods/models/detail')?>",
             productRecommendsApi: "<?=$this->url('/goods/product')?>?isApi=1",
             cateList: JSON.parse('<?=$cateList?>'),
             cate_cat: [],

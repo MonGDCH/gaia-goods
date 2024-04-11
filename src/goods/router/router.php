@@ -58,7 +58,7 @@ Route::instance()->group(Config::instance()->get('admin.app.root_path', ''), fun
                 // 查看
                 $route->get('', [ModelsController::class, 'index']);
                 // 获取模型信息
-                $route->get('/getInfo', [ModelsController::class, 'getInfo']);
+                $route->get('/detail', [ModelsController::class, 'detail']);
                 // 新增
                 $route->map(['GET', 'POST'], '/add', [ModelsController::class, 'add']);
                 // 编辑

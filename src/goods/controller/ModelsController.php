@@ -20,12 +20,12 @@ use plugins\goods\contract\GoodsModelsEmun;
 class ModelsController extends Controller
 {
     /**
-     * 获取模型信息
+     * 获取模型详情
      *
      * @param Request $request
      * @return mixed
      */
-    public function getInfo(Request $request)
+    public function detail(Request $request)
     {
         $id = $request->get('idx');
         if (!check('id', $id)) {
