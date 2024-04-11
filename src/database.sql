@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `goods_shipping_tmp` (
   `continue` decimal(12, 2) NOT NULL DEFAULT '0.00' COMMENT '续件',
   `continue_price` decimal(12, 2) NOT NULL DEFAULT '0.00' COMMENT '续件运费',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '备注',
-  `sort` tinyint(3) UNSIGNED NOT NULL DEFAULT '1' 0 COMMENT '排序',
+  `sort` tinyint(3) UNSIGNED NOT NULL DEFAULT '50' COMMENT '排序',
   `status` tinyint(3) UNSIGNED NOT NULL DEFAULT '1' COMMENT '1:正常,0:禁用',
   `update_time` int(10) UNSIGNED NOT NULL,
   `create_time` int(10) UNSIGNED NOT NULL,
